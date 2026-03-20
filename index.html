@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>Amplop Lebaran - Selamat Idul Fitri 1446H</title>
+  <title>Amplop Lebaran Interaktif - Idul Fitri 1446H</title>
   <style>
     * {
       margin: 0;
@@ -18,493 +18,566 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI', 'Poppins', 'Amiri', 'Cairo', 'Times New Roman', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+      font-family: 'Segoe UI', 'Poppins', 'Amiri', 'Cairo', system-ui, sans-serif;
       padding: 16px;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    /* Container utama - efek kartu amplop */
-    .envelope-container {
-      max-width: 500px;
+    /* Partikel bintang berkilauan */
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      margin: 0 auto;
-      animation: fadeSlideUp 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: radial-gradient(circle, #ffefb9, #ffd966);
+      border-radius: 50%;
+      opacity: 0;
+      animation: twinkle 3s infinite ease-in-out;
     }
 
-    /* Desain amplop utama */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.8);}
+      50% { opacity: 0.8; transform: scale(1);}
+    }
+
+    /* Container utama */
+    .wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    /* Animasi amplop utama dengan efek ketukan dan buka */
+    .envelope-area {
+      perspective: 1200px;
+      transition: all 0.3s ease;
+    }
+
+    .envelope-3d {
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      transform-style: preserve-3d;
+    }
+
+    /* Efek getaran saat hover/klik (mobile tap) */
+    .envelope-3d:active {
+      transform: scale(0.98) translateY(4px);
+    }
+
+    /* Kartu amplop utama */
     .envelope-card {
       background: #fffcf0;
-      background-image: radial-gradient(circle at 25% 40%, rgba(218, 165, 32, 0.05) 2%, transparent 2.5%),
-                        radial-gradient(circle at 75% 85%, rgba(210, 150, 75, 0.05) 1.8%, transparent 2.2%);
-      background-size: 40px 40px, 35px 35px;
-      border-radius: 32px 32px 32px 32px;
-      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 200, 0.8);
+      background-image: radial-gradient(circle at 20% 30%, rgba(218, 165, 32, 0.08) 2%, transparent 2.5%),
+                        radial-gradient(circle at 80% 70%, rgba(210, 150, 75, 0.08) 1.8%, transparent 2.2%);
+      background-size: 45px 45px, 38px 38px;
+      border-radius: 28px 28px 28px 28px;
+      box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 245, 200, 0.9);
       overflow: hidden;
       position: relative;
-      transition: transform 0.2s ease;
+      transition: box-shadow 0.3s;
     }
 
-    /* Ornamen sudut amplop (islamic geometric hint) */
-    .envelope-card::before {
-      content: "";
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 65px;
-      height: 65px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23D4AF37" fill-opacity="0.2" d="M20,20 L35,20 L27.5,32 L20,20z M80,20 L65,20 L72.5,32 L80,20z M20,80 L35,80 L27.5,68 L20,80z M80,80 L65,80 L72.5,68 L80,80z M50,20 L45,32 L55,32 L50,20z M50,80 L45,68 L55,68 L50,80z M20,50 L32,45 L32,55 L20,50z M80,50 L68,45 L68,55 L80,50z"/><circle cx="50" cy="50" r="8" fill="%23D4AF37" fill-opacity="0.2"/></svg>') no-repeat center/contain;
-      pointer-events: none;
+    /* Flap amplop animasi (seperti segitiga yang bisa "terbuka" sedikit) */
+    .envelope-flap {
+      background: linear-gradient(145deg, #fae7b3, #efd394);
+      height: 100px;
+      position: relative;
+      clip-path: polygon(0% 0%, 100% 0%, 50% 65%, 0% 0%);
+      transition: all 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+      transform-origin: top;
+      z-index: 5;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Efek amplop terbuka saat di-klik (menambah kelas .opened) */
+    .envelope-area.opened .envelope-flap {
+      transform: rotateX(180deg);
+      clip-path: polygon(0% 0%, 100% 0%, 50% 0%, 0% 0%);
+      background: #e9cf8b;
       opacity: 0.6;
     }
 
-    .envelope-card::after {
-      content: "";
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 65px;
-      height: 65px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="%23B8860B" fill-opacity="0.2" d="M20,20 L35,20 L27.5,32 L20,20z M80,20 L65,20 L72.5,32 L80,20z M20,80 L35,80 L27.5,68 L20,80z M80,80 L65,80 L72.5,68 L80,80z M50,20 L45,32 L55,32 L50,20z M50,80 L45,68 L55,68 L50,80z M20,50 L32,45 L32,55 L20,50z M80,50 L68,45 L68,55 L80,50z"/><circle cx="50" cy="50" r="8" fill="%23B8860B" fill-opacity="0.2"/></svg>') no-repeat center/contain;
-      pointer-events: none;
-      opacity: 0.5;
-      transform: rotate(180deg);
+    .envelope-area.opened .envelope-content {
+      animation: contentPop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
     }
 
-    /* "Flap" amplop bagian atas (efek segitiga) */
-    .envelope-flap {
-      background: linear-gradient(135deg, #fae7b3 0%, #efd394 100%);
-      height: 85px;
-      position: relative;
-      clip-path: polygon(0% 0%, 100% 0%, 50% 60%, 0% 0%);
-      margin-bottom: -20px;
-      z-index: 2;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    @keyframes contentPop {
+      0% {
+        transform: scale(0.96);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.02);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
-    /* isi amplop (konten utama) */
+    /* konten amplop */
     .envelope-content {
       padding: 20px 24px 40px 24px;
       position: relative;
-      z-index: 3;
+      z-index: 4;
       background: #fffef7;
-      border-radius: 0 0 32px 32px;
+      border-radius: 0 0 28px 28px;
+      transition: all 0.3s;
     }
 
-    /* kaligrafi / ornamen bulan bintang */
+    /* Ornamen sudut emas */
+    .corner-deco {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .corner-tl {
+      top: 12px;
+      left: 12px;
+      border-top: 3px solid #e4bc6e;
+      border-left: 3px solid #e4bc6e;
+      width: 45px;
+      height: 45px;
+      border-radius: 12px 0 0 0;
+    }
+    .corner-br {
+      bottom: 12px;
+      right: 12px;
+      border-bottom: 3px solid #e4bc6e;
+      border-right: 3px solid #e4bc6e;
+      width: 45px;
+      height: 45px;
+      border-radius: 0 0 12px 0;
+    }
+
     .islamic-header {
       text-align: center;
-      margin-bottom: 16px;
-      position: relative;
+      margin-bottom: 12px;
     }
-
-    .star-moon {
-      font-size: 38px;
-      letter-spacing: 8px;
-      color: #c9a03d;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    .moon-animate {
+      font-size: 44px;
       display: inline-block;
-      animation: gentleGlow 2s infinite alternate;
+      animation: moonGlow 2s infinite alternate, float 3s ease-in-out infinite;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
     }
-
+    @keyframes moonGlow {
+      0% { text-shadow: 0 0 2px #f5bc70; color: #e2b35c;}
+      100% { text-shadow: 0 0 12px #ffda88; color: #ffcd7e;}
+    }
+    @keyframes float {
+      0% { transform: translateY(0px);}
+      100% { transform: translateY(-5px);}
+    }
     .tahun-hijriah {
-      font-size: 14px;
-      font-weight: 500;
-      background: #f0e7d0;
+      font-size: 13px;
+      font-weight: 600;
+      background: #e9ddbb;
       display: inline-block;
-      padding: 4px 14px;
-      border-radius: 60px;
-      color: #8b6b2d;
-      font-family: monospace;
-      letter-spacing: 1px;
-      margin-top: 8px;
-    }
-
-    /* Judul utama */
-    .judul-ucapan {
-      text-align: center;
-      font-size: 26px;
-      font-weight: 800;
-      color: #2c5a4b;
-      margin: 12px 0 6px 0;
-      font-family: 'Amiri', 'Times New Roman', serif;
-      letter-spacing: -0.2px;
-    }
-
-    .badge-idul {
-      background: linear-gradient(95deg, #e4c580, #dbb55c);
-      color: #2d3e2b;
-      font-size: 16px;
-      font-weight: bold;
-      display: inline-block;
-      padding: 6px 18px;
+      padding: 4px 16px;
       border-radius: 40px;
-      margin-bottom: 18px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      color: #7a582b;
+      margin-top: 6px;
       backdrop-filter: blur(2px);
     }
 
-    /* kalimat utama */
-    .main-greeting {
+    .judul-ucapan {
+      text-align: center;
       font-size: 28px;
       font-weight: 800;
+      color: #2c5a4b;
+      margin: 8px 0 4px;
+      font-family: 'Amiri', serif;
+    }
+    .badge-idul {
+      background: linear-gradient(105deg, #e9c989, #deb565);
+      font-size: 15px;
+      font-weight: bold;
+      padding: 5px 18px;
+      border-radius: 30px;
+      display: inline-block;
+      margin: 6px 0 12px;
+      color: #2b442c;
+    }
+
+    .main-greeting {
+      font-size: 26px;
+      font-weight: 800;
       text-align: center;
-      color: #b5722e;
-      font-family: 'Amiri', 'Cairo', serif;
-      line-height: 1.3;
-      margin: 16px 0 12px;
-      background: linear-gradient(125deg, #b56a1c, #e0a44b);
+      background: linear-gradient(135deg, #b86f28, #e5b15c);
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
-      text-shadow: none;
+      margin: 12px 0 8px;
     }
 
     .arabic-doa {
       font-size: 28px;
       text-align: center;
-      font-family: 'Amiri', 'Traditional Arabic', serif;
+      font-family: 'Amiri', serif;
       font-weight: 600;
       color: #2f5e4c;
-      background: #faf3e0;
-      padding: 12px 8px;
+      background: #faf0df;
+      padding: 14px 8px;
       border-radius: 60px;
-      margin: 20px 0;
-      line-height: 1.4;
+      margin: 16px 0;
+      line-height: 1.45;
       direction: rtl;
-      letter-spacing: 1px;
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 6px 12px rgba(161, 109, 14, 0.1);
+      box-shadow: inset 0 0 0 1px #fff3e0, 0 8px 18px rgba(0,0,0,0.05);
     }
-
     .latin-trans {
       font-size: 15px;
       text-align: center;
-      color: #876b38;
-      margin-top: -12px;
-      margin-bottom: 18px;
-      font-style: italic;
+      color: #8b693a;
+      margin-top: -10px;
+      margin-bottom: 16px;
       font-weight: 500;
     }
 
+    .taqabbal-box {
+      background: linear-gradient(115deg, #eeddae, #f6e8ca);
+      border-radius: 48px;
+      padding: 12px 10px;
+      text-align: center;
+      margin: 12px 0 16px;
+    }
     .taqabbal-text {
       font-size: 18px;
-      font-weight: 700;
-      text-align: center;
-      background: #e9ddbb;
-      padding: 14px 12px;
-      border-radius: 48px;
+      font-weight: 800;
       color: #4a3520;
-      margin: 18px 0 12px;
-      word-break: keep-all;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
-
+    .taqabbal-arab {
+      font-size: 26px;
+      font-family: 'Amiri', serif;
+      font-weight: 600;
+      color: #8b5a2b;
+    }
     .minal-aidzin {
       font-size: 22px;
       font-weight: 800;
       text-align: center;
       color: #a76f2a;
-      background: #fff2df;
-      padding: 14px 10px;
+      background: #fff5e6;
+      padding: 14px 12px;
       border-radius: 40px;
-      margin: 10px 0 16px;
-      font-family: 'Poppins', sans-serif;
-      letter-spacing: 1px;
+      margin: 12px 0;
     }
 
-    /* dekorasi garis dan motif timur */
-    .divider-floral {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .divider-floral span {
-      font-size: 24px;
-      color: #e2bc6c;
-    }
-    .divider-line {
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #e2bc6c, #d4a373, #e2bc6c, transparent);
-      flex: 1;
-    }
-
-    /* tombol kirim / salin ucapan (interaksi modern) */
+    /* Tombol aksi */
     .action-buttons {
       display: flex;
-      flex-wrap: wrap;
       gap: 14px;
       justify-content: center;
-      margin: 24px 0 12px;
+      margin: 20px 0 12px;
+      flex-wrap: wrap;
     }
-
-    .btn-share {
-      background: #2c6e5c;
+    .btn {
       border: none;
-      padding: 12px 20px;
-      border-radius: 50px;
-      color: white;
-      font-weight: 600;
-      font-size: 15px;
+      padding: 12px 22px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 14px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      box-shadow: 0 5px 12px rgba(0,0,0,0.1);
-      transition: all 0.2s;
-      backdrop-filter: blur(2px);
-      font-family: inherit;
+      transition: all 0.2s ease;
+      background: #2c6e5c;
+      color: white;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.15);
     }
-
-    .btn-share:active {
-      transform: scale(0.96);
-      background: #1f5546;
-    }
-
     .btn-copy {
-      background: #b88b40;
+      background: #b27d40;
+    }
+    .btn:active {
+      transform: scale(0.94);
+    }
+    .btn-share {
+      background: #1d7a62;
+    }
+
+    /* efek tambahan */
+    .floating-petal {
+      position: fixed;
+      pointer-events: none;
+      font-size: 20px;
+      animation: fall 6s linear forwards;
+      z-index: 100;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-10vh) rotate(0deg);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
     }
 
     .toast-msg {
       visibility: hidden;
-      min-width: 200px;
-      background-color: #2c5a4b;
+      background: #2c5a4b;
       color: #f9eec1;
-      text-align: center;
+      padding: 10px 20px;
       border-radius: 50px;
-      padding: 10px 18px;
       position: fixed;
       bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 14px;
       font-weight: bold;
       z-index: 200;
       opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: 0.2s;
       white-space: nowrap;
-      pointer-events: none;
+      font-size: 14px;
       font-family: monospace;
     }
-
     .toast-msg.show {
       visibility: visible;
       opacity: 1;
     }
-
-    /* footer kecil */
     .footer-note {
       text-align: center;
-      font-size: 11px;
-      color: #a88852;
-      margin-top: 20px;
-      border-top: 1px dashed #ecdcaa;
-      padding-top: 16px;
+      font-size: 10px;
+      color: #b6965c;
+      margin-top: 16px;
+      border-top: 1px solid #ecdcaa;
+      padding-top: 12px;
     }
-
-    /* animasi */
-    @keyframes fadeSlideUp {
-      0% {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    /* petunjuk buka amplop */
+    .tap-hint {
+      text-align: center;
+      font-size: 12px;
+      color: #b87c3a;
+      margin-top: -12px;
+      margin-bottom: 8px;
+      font-weight: 500;
+      background: #fff1e0;
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 30px;
+      backdrop-filter: blur(4px);
     }
-
-    @keyframes gentleGlow {
-      0% {
-        text-shadow: 0 0 1px #f7d44a;
-        opacity: 0.8;
-      }
-      100% {
-        text-shadow: 0 0 8px #f7d44a;
-        opacity: 1;
-      }
-    }
-
-    /* sentuhan efek amplop terbuka */
-    .envelope-card:hover {
-      transform: scale(1.01);
-    }
-
-    /* responsif tambahan */
-    @media (max-width: 480px) {
-      .envelope-content {
-        padding: 16px 20px 32px 20px;
-      }
-      .main-greeting {
-        font-size: 26px;
-      }
-      .arabic-doa {
-        font-size: 24px;
-      }
-      .judul-ucapan {
-        font-size: 22px;
-      }
-      .minal-aidzin {
-        font-size: 20px;
-      }
+    .hint-container {
+      display: flex;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
-<div class="envelope-container">
-  <div class="envelope-card">
-    <!-- Lipatan atas amplop -->
-    <div class="envelope-flap"></div>
-    <div class="envelope-content">
-      <div class="islamic-header">
-        <div class="star-moon">☪ ✨ 🌙</div>
-        <div class="tahun-hijriah">1446 H · Syawal 1446</div>
-      </div>
-
-      <div class="judul-ucapan">
-        Selamat Hari Raya
-      </div>
-      <div style="text-align: center;">
-        <span class="badge-idul">Idul Fitri 1446 Hijriah</span>
-      </div>
-
-      <!-- Ucapan utama -->
-      <div class="main-greeting">
-        ✨ Taqabbalallahu minna wa minkum ✨
-      </div>
-
-      <!-- Kalimat Arab lengkap (Taqabbalahu minna wa minkum taqabbal ya karim) -->
-      <div class="arabic-doa">
-        تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ<br>
-        تَقَبَّلْ يَا كَرِيمُ
-      </div>
-      <div class="latin-trans">
-        "Taqabbalallahu minna wa minkum, taqabbal yaa Kariim"
-      </div>
-
-      <!-- Doa dengan lengkap sesuai permintaan: Taqabballah hu minna wa minkum Taqabbal ya karim -->
-      <div class="taqabbal-text">
-        🤲  تَقَبَّلَ اللهُ مِنَّا وَمِنْكُمْ  🤲<br>
-        <span style="font-size: 14px; font-weight: normal;">Taqabbalallahu minna wa minkum, Taqabbal ya Karim</span>
-      </div>
-
-      <!-- Minal Aidzin Wal Faidzin -->
-      <div class="minal-aidzin">
-        مِيْنَ الْعَائِدِيْنَ وَالْفَائِزِيْنَ<br>
-        <span style="font-size: 16px; font-weight: 500;">Minal Aidzin Wal Faidzin</span>
-      </div>
-
-      <div class="divider-floral">
-        <span>🌼</span>
-        <div class="divider-line"></div>
-        <span>🌺</span>
-        <div class="divider-line"></div>
-        <span>🌼</span>
-      </div>
-
-      <!-- Tombol berbagi via HP (share & copy teks) -->
-      <div class="action-buttons">
-        <button class="btn-share" id="shareBtn">
-          📱 Bagikan Amplop
-        </button>
-        <button class="btn-share btn-copy" id="copyBtn">
-          📋 Salin Ucapan
-        </button>
-      </div>
-
-      <div class="footer-note">
-        🌙 Semoga berkah & fitri kembali suci 🌙
+<div class="stars" id="starsContainer"></div>
+<div class="wrapper">
+  <div class="envelope-area" id="envelopeArea">
+    <div class="envelope-3d">
+      <div class="envelope-card">
+        <div class="envelope-flap"></div>
+        <div class="envelope-content">
+          <div class="corner-deco corner-tl"></div>
+          <div class="corner-deco corner-br"></div>
+          <div class="islamic-header">
+            <div class="moon-animate">☪️🌙✨</div>
+            <div class="tahun-hijriah">Idul Fitri 1446 H · Syawal</div>
+          </div>
+          <div class="judul-ucapan">Selamat Hari Raya</div>
+          <div style="text-align: center;"><span class="badge-idul">🏮 Idul Fitri 1446H 🏮</span></div>
+          <div class="main-greeting">Taqabbalallahu minna wa minkum</div>
+          <div class="arabic-doa">
+            تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ<br>
+            تَقَبَّلْ يَا كَرِيمُ
+          </div>
+          <div class="latin-trans">"Taqabbalallahu minna wa minkum, Taqabbal ya Karim"</div>
+          
+          <div class="taqabbal-box">
+            <div class="taqabbal-arab">تَقَبَّلَ اللهُ مِنَّا وَمِنْكُمْ</div>
+            <div class="taqabbal-text">🤲 Taqabbal ya Karim 🤲</div>
+          </div>
+          
+          <div class="minal-aidzin">
+            مِيْنَ الْعَائِدِيْنَ وَالْفَائِزِيْنَ<br>
+            <span style="font-size: 16px;">Minal Aidzin Wal Faidzin • Mohon Maaf Lahir Batin</span>
+          </div>
+          
+          <div class="hint-container">
+            <div class="tap-hint" id="tapHint">✨ ketuk amplop untuk membuka ✨</div>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn btn-share" id="shareBtn">📤 Bagikan Amplop</button>
+            <button class="btn btn-copy" id="copyBtn">📋 Salin Ucapan</button>
+          </div>
+          <div class="footer-note">
+            🌙 Semoga berkah & fitri kembali suci • 1446H 🌙
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
 <div id="toastMsg" class="toast-msg">✨ Tersalin ✨</div>
 
 <script>
-  (function() {
-    // Teks ucapan lengkap yang indah untuk dibagikan / copy
-    const fullGreetingMessage = 
-      `🌙 *Selamat Hari Raya Idul Fitri 1446H* 🌙\n\n` +
-      `✨ *Taqabbalallahu minna wa minkum, taqabbal ya karim* ✨\n` +
-      `تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ  تَقَبَّلْ يَا كَرِيمُ\n\n` +
-      `Minal Aidzin Wal Faidzin, mohon maaf lahir dan batin.\n\n` +
-      `Semoga Allah menerima amal ibadah kita dan mengembalikan kita dalam keadaan suci. 🕌✨\n\n` +
-      `— Amplop Lebaran 1446H —`;
-
-    // Elemen
-    const shareBtn = document.getElementById('shareBtn');
-    const copyBtn = document.getElementById('copyBtn');
-    const toast = document.getElementById('toastMsg');
-
-    let toastTimeout;
-
-    function showToast(message) {
-      if (toastTimeout) clearTimeout(toastTimeout);
-      toast.textContent = message || '✨ Tersalin ✨';
-      toast.classList.add('show');
-      toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2200);
+  // Bintang animasi latar
+  function createStars() {
+    const starsContainer = document.getElementById('starsContainer');
+    for(let i = 0; i < 70; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const size = Math.random() * 3 + 1.5;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 5 + 's';
+      star.style.animationDuration = Math.random() * 2 + 2 + 's';
+      starsContainer.appendChild(star);
     }
+  }
+  createStars();
 
-    // Fungsi share menggunakan Web Share API (mobile friendly)
-    async function handleShare() {
-      // Cek apakah support share
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Amplop Lebaran Idul Fitri 1446H',
-            text: fullGreetingMessage,
-            // bisa juga menambahkan url jika ingin, namun cukup teks indah
-          });
-          showToast('📤 Terbagi!');
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            // Fallback jika gagal atau tidak ada share, copy saja
-            fallbackCopy();
-          } else {
-            // user membatalkan
-          }
-        }
-      } else {
-        // fallback untuk device yang tidak support Web Share (atau PC)
-        fallbackCopy();
-      }
+  // Animasi kelopak / bintang jatuh saat amplop dibuka
+  function createFloatingEffect() {
+    const petals = ['🌙', '✨', '⭐', '🌼', '🌺', '🕌', '☪️'];
+    for(let i = 0; i < 18; i++) {
+      const petal = document.createElement('div');
+      petal.classList.add('floating-petal');
+      petal.innerText = petals[Math.floor(Math.random() * petals.length)];
+      petal.style.left = Math.random() * 100 + '%';
+      petal.style.fontSize = Math.random() * 20 + 16 + 'px';
+      petal.style.animationDuration = Math.random() * 3 + 3 + 's';
+      petal.style.animationDelay = Math.random() * 1.5 + 's';
+      petal.style.opacity = Math.random() * 0.7 + 0.4;
+      document.body.appendChild(petal);
+      setTimeout(() => { if(petal && petal.remove) petal.remove(); }, 6000);
     }
+  }
 
-    function fallbackCopy() {
-      copyToClipboard(fullGreetingMessage);
-      showToast('📋 Ucapan disalin, bisa ditempel ke chat!');
+  // Amplop interaktif buka-tutup dengan efek membuka dan trigger confetti style
+  const envelopeArea = document.getElementById('envelopeArea');
+  let isOpened = false;
+
+  function openEnvelope() {
+    if(isOpened) return;
+    isOpened = true;
+    envelopeArea.classList.add('opened');
+    // animasi kejutan: partikel berkilau & efek ucapan
+    createFloatingEffect();
+    // ubah hint text
+    const hintEl = document.getElementById('tapHint');
+    if(hintEl) hintEl.innerText = '📬 Amplop terbuka! Selamat Lebaran 📬';
+    setTimeout(() => {
+      if(hintEl) hintEl.innerText = '✨ ketuk lagi untuk berbagi kebahagiaan ✨';
+    }, 3000);
+    // tambahan efek gemerlap
+    const mainCard = document.querySelector('.envelope-card');
+    if(mainCard) {
+      mainCard.style.boxShadow = '0 35px 50px -12px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,215,0,0.3)';
     }
+    // optional: play sedikit getaran haptic (jika support)
+    if(navigator.vibrate) navigator.vibrate(50);
+  }
 
-    async function copyToClipboard(text) {
+  // Saat tap di envelopeArea (kecuali tombol), buka amplop
+  envelopeArea.addEventListener('click', (e) => {
+    // jangan jika target adalah tombol, biar tombol tetap berfungsi
+    if(e.target.closest('.btn')) return;
+    if(!isOpened) {
+      openEnvelope();
+    } else {
+      // jika sudah terbuka, bisa tambahkan efek gemerlap lagi tanpa merusak
+      createFloatingEffect();
+      if(navigator.vibrate) navigator.vibrate(30);
+    }
+  });
+
+  // teks lengkap untuk share / copy
+  const fullMessage = 
+    `🌙✨ *Selamat Hari Raya Idul Fitri 1446H* ✨🌙\n\n` +
+    `🤲 *Taqabbalallahu minna wa minkum, taqabbal ya karim* 🤲\n` +
+    `تَقَبَّلَ اللَّهُ مِنَّا وَمِنْكُمْ  تَقَبَّلْ يَا كَرِيمُ\n\n` +
+    `Minal Aidzin Wal Faidzin, mohon maaf lahir dan batin.\n\n` +
+    `Semoga Allah SWT menerima amal ibadah kita dan mengembalikan fitri suci. 🕌☪️\n\n` +
+    `— Amplop Lebaran Digital 1446H —`;
+
+  const toast = document.getElementById('toastMsg');
+  let toastTimeout;
+
+  function showToast(msg) {
+    if(toastTimeout) clearTimeout(toastTimeout);
+    toast.textContent = msg || '✨ Berhasil ✨';
+    toast.classList.add('show');
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch(e) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return true;
+    }
+  }
+
+  // Tombol Copy
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await copyText(fullMessage);
+    showToast('📋 Ucapan disalin! Tempelkan ke chat 💬');
+    if(navigator.vibrate) navigator.vibrate(30);
+    // efek kilat kecil
+  });
+
+  // Tombol Share
+  const shareBtn = document.getElementById('shareBtn');
+  shareBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if(navigator.share) {
       try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        // Fallback textarea
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
+        await navigator.share({
+          title: 'Amplop Lebaran Idul Fitri 1446H',
+          text: fullMessage,
+        });
+        showToast('📤 Terbagi, selamat merayakan!');
+      } catch(err) {
+        if(err.name !== 'AbortError') {
+          await copyText(fullMessage);
+          showToast('🔁 Dicopy, bisa dishare manual');
+        }
       }
+    } else {
+      await copyText(fullMessage);
+      showToast('📋 Ucapan disalin, bagikan ke keluarga!');
     }
+    if(navigator.vibrate) navigator.vibrate(30);
+  });
 
-    // Tombol copy khusus
-    async function handleCopy() {
-      await copyToClipboard(fullGreetingMessage);
-      showToast('📋 Ucapan siap dibagikan!');
-    }
+  // Efek auto welcome - sedikit shimmer di awal
+  setTimeout(() => {
+    const hint = document.getElementById('tapHint');
+    if(hint) hint.style.transform = 'scale(1.02)';
+    setTimeout(() => { if(hint) hint.style.transform = ''; }, 500);
+  }, 500);
 
-    // Event listeners
-    shareBtn.addEventListener('click', handleShare);
-    copyBtn.addEventListener('click', handleCopy);
-
-    // Efek tambahan: agar amplop makin meriah, tidak ada auto-play musik, cukup visual
-    // Optional: menambahkan sentuhan interaktif pada amplop (tidak wajib)
-    console.log('Amplop digital Idul Fitri 1446H siap dibagikan 💌');
-  })();
+  // tambahan sentuhan agar amplop bisa dibuka juga oleh sentuhan di flap area, tapi keseluruhan sudah
+  console.log('Amplop Lebaran 1446H animasi siap!');
 </script>
 </body>
 </html>
